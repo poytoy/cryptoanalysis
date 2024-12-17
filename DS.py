@@ -13,7 +13,38 @@ def random_string(length):
         """
         characters = string.ascii_letters + string.digits  # You can add more characters if needed
         return ''.join(random.choice(characters) for _ in range(length))
+def generate_composite_with_exact_bit_length(num_factors, bit_length):
+    """
+    Generate a composite number with known factors, ensuring the composite number 
+    has the exact bit length.
 
+    Args:
+        num_factors (int): Number of prime factors to use.
+        bit_length (int): Desired exact bit length of the composite number.
+
+    Returns:
+        tuple: The composite number and its prime factors.
+    """
+    primes = []
+    composite = 1
+
+    # Generate primes and multiply them to create a composite
+    while True:
+        # Generate a random prime of approximately bit_length // num_factors bits
+        prime_bit_length = bit_length // num_factors
+        prime = generate_n_bit_prime(prime_bit_length)
+        primes.append(prime)
+        composite *= prime
+        
+        # If composite's bit length exceeds desired size, stop generating primes
+        if composite.bit_length() >= bit_length:
+            break
+
+    # Adjust the composite number if it's larger than desired
+    while composite.bit_length() > bit_length:
+        composite //= 2  # Dividing by 2 to scale it down (keep primes intact)
+
+    return composite, primes
 def generate_n_bit_prime(n):
     """Generate an n-bit prime number efficiently."""
     if n < 2:
@@ -24,32 +55,33 @@ def generate_n_bit_prime(n):
         candidate = random.getrandbits(n) | (1 << (n - 1)) | 1  # Ensure n-bit and odd
         if gmpy2.is_prime(candidate):  # Check primality
             return candidate
-def generate_q_and_b(q_n,p_n):
-    q = generate_n_bit_prime(q_n)
+def generate_q_and_primes(n):
+    while True:
+        num_factors = random.randint(2, 5)
+        composite, primes= generate_composite_with_exact_bit_length(num_factors,n)
+        candidate=composite+1
+        if gmpy2.is_prime(candidate):
+            print(f"{candidate} is prime.")
+            return candidate,primes
+            
+def generate_q_primes_and_p(q_n,p_n):
+    q,primes = generate_q_and_primes(q_n)
     for _ in range(10000000):
         k = random.getrandbits( p_n-q_n-1) | (1 << (p_n - q_n - 2))
         p=k*q+1
         if gmpy2.is_prime(p):
-            return q,p
-def factorize(n):
-    factors = []
-    i = 2
-    while i * i <= n:
-        while n % i == 0:
-            factors.append(i)
-            n //= i
-        i += 1
-    if n > 1:
-        factors.append(n)
-    return factors
-def find_generator(q, p):
-    """Find a generator g of the subgroup of order q in Z*_p."""
+            return q,p,primes
+def find_generator(p, q, factors_of_q):
     while True:
-        g = random.randint(2, p - 2)  # Random candidate for g
-        if pow(g, (p - 1) // q, p) != 1:
-            # Ensure that g^q mod p = 1 (g is in the subgroup of order q)
+        g = random.randint(2, p - 2)
+        for d in factors_of_q:
+            if gmpy2.powmod(g, q // d, p) == 1:
+                break
+        else:
+            # If no divisor caused g^d = 1 mod p, check if g^q mod p == 1
             if pow(g, q, p) == 1:
-                return g
+                return g  # Found a valid generator
+    
 def SignGen(message, q, p, g, alpha):
     k=random.randint(1,q-2)
     r=pow(g,k,p)
@@ -93,8 +125,8 @@ def GenerateOrRead(filename):
             g = int(lines[2].strip())
             return q, p, g
     else:
-        q, p = generate_q_and_b(224,2048)
-        g = find_generator(q,p)
+        q,p,primes = generate_q_primes_and_p(224,2048)
+        g = find_generator(q,p,primes)
         with open(filename, 'w') as file:
             file.write(f"{q}\n")
             file.write(f"{p}\n")
@@ -103,6 +135,7 @@ def GenerateOrRead(filename):
 
 def main():
     q,p,g=GenerateOrRead("pubparams.txt")
+    print(g)
     alpha = int(input(f"chose random int between 0 and {q-1}:"))
     beta = pow(g, alpha, p)
     message=b"hello world"
