@@ -8,7 +8,7 @@ import os.path
 import sys
 
 import DS
-#import Tx
+import Tx
 
     
 ##############        
@@ -148,4 +148,3 @@ else:
         if result[i] == -1:
             print("Failure: transaction", i+1, "does not verify: Failed!")
     sys.exit()
-
