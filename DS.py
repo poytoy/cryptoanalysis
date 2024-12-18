@@ -35,14 +35,11 @@ def find_generator( q, p,k):
     print("p-1",p-1)
     print("q",q)
     print("div",div)
-    c=1
-    for g in range(2,p-1):
-        c=c+1
-        if c%100==0:print(c)
-        if pow(g,q,p)==1:
-            print("a")
-            if pow(g,div,p)!=1:
-                return g
+
+    for g in range(5,p-1):
+        if pow(g,div,p)!=1:
+            if pow(g,q,p)==1: # search for an easier way to deterime if order is exactly q.
+              return g
 
 #2.Key Generation
 def KeyGen(q,p,g):
@@ -92,7 +89,7 @@ def GenerateOrRead(filename):
             return q, p, g
         
     else:
-        q,p,k = generate_q_and_p(22,204)
+        q,p,k = generate_q_and_p(10,25)#should be 224 2048
         g = find_generator(q,p,k)
         with open(filename, 'w') as file:
             file.write(f"{q}\n")
