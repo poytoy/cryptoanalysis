@@ -2,7 +2,6 @@ import random
 import gmpy2
 import hashlib
 import os
-import PhaseI_Test
 import string
 import Tx
 
@@ -11,31 +10,6 @@ def random_string(length):
     #generates a random string of the specified length, with uppercase, lowercase, and digits.
     characters = string.ascii_letters + string.digits  # You can add more characters if needed
     return ''.join(random.choice(characters) for _ in range(length))
-
-def generate_composite_with_exact_bit_length(num_factors, bit_length):
-    #generates a composite number with known factors, ensuring the composite number has the exact bit length.
-
-    primes = []
-    composite = 1
-
-    # Generate primes and multiply them to create a composite
-    while True:
-        # Generate a random prime of approximately bit_length // num_factors bits
-        prime_bit_length = bit_length // num_factors
-        prime = generate_n_bit_prime(prime_bit_length)
-        primes.append(prime)
-        composite *= prime
-        
-        # If composite's bit length exceeds desired size, stop generating primes
-        if composite.bit_length() >= bit_length:
-            break
-
-    # Adjust the composite number if it's larger than desired
-    while composite.bit_length() > bit_length:
-        composite //= 2  # Dividing by 2 to scale it down (keep primes intact)
-
-    return composite, primes
-
 def generate_n_bit_prime(n):
     if n < 2:
         raise ValueError("Number of bits must be at least 2.")
@@ -45,39 +19,30 @@ def generate_n_bit_prime(n):
         candidate = random.getrandbits(n) | (1 << (n - 1)) | 1  # Ensure n-bit and odd
         if gmpy2.is_prime(candidate):  # Check primality
             return candidate
-
-def generate_q_and_primes(n):
-    while True:
-        num_factors = random.randint(2, 5)
-        composite, primes= generate_composite_with_exact_bit_length(num_factors,n)
-        candidate=composite+1
-
-        if gmpy2.is_prime(candidate):
-            print(f"{candidate} is prime.")
-            return candidate,primes
-
-def generate_q_primes_and_p(q_n,p_n):
-    q,primes = generate_q_and_primes(q_n)
+def generate_q_and_p(q_n,p_n):
+    q = generate_n_bit_prime(q_n)
 
     for _ in range(10000000):
         k = random.getrandbits( p_n-q_n-1) | (1 << (p_n - q_n - 2))
         p=k*q+1
-
+        
         if gmpy2.is_prime(p):
-            return q,p,primes
+            return q,p,k
         
-def find_generator(p, q, factors_of_q):
-    while True:
-        g = random.randint(2, p - 2)
-        
-
-        for d in factors_of_q:
-            if gmpy2.powmod(g, q // d, p) == 1:
-                break
-        else:
-            # If no divisor caused g^d = 1 mod p, check if g^q mod p == 1
-            if pow(g, q, p) == 1:
-                return g  # Found a valid generator
+def find_generator( q, p,k):
+    #p-1 divided by q for genenrator.
+    div=k
+    print("p-1",p-1)
+    print("q",q)
+    print("div",div)
+    c=1
+    for g in range(2,p-1):
+        c=c+1
+        if c%100==0:print(c)
+        if pow(g,q,p)==1:
+            print("a")
+            if pow(g,div,p)!=1:
+                return g
 
 #2.Key Generation
 def KeyGen(q,p,g):
@@ -127,8 +92,8 @@ def GenerateOrRead(filename):
             return q, p, g
         
     else:
-        q,p,primes = generate_q_primes_and_p(224,2048)
-        g = find_generator(p,q,primes)
+        q,p,k = generate_q_and_p(22,204)
+        g = find_generator(q,p,k)
         with open(filename, 'w') as file:
             file.write(f"{q}\n")
             file.write(f"{p}\n")
@@ -137,6 +102,7 @@ def GenerateOrRead(filename):
 
 def main():
     q,p,g=GenerateOrRead("pubparams.txt")
+    
     print(f"g: {g}")
 
     alpha, beta = KeyGen(q,p,g)
