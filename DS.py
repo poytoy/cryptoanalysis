@@ -28,8 +28,6 @@ def generate_q_and_p(q_n,p_n):
         p=k*q+1
         if(p.bit_length()==p_n):#check p.bit_length() == p_n
             if gmpy2.is_prime(p): #check p is prime
-                print("bit size of q: ", q.bit_length())
-                print("bit size of p: ", p.bit_length())
                 return q,p,k
 
 def find_generator(p,q,k):
