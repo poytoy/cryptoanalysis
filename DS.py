@@ -24,13 +24,13 @@ def generate_q_and_p(q_n,p_n):
     q = generate_n_bit_prime(q_n)
 
     for _ in range(10000000):
-        k = random.getrandbits( p_n - q_n)
+        k = random.getrandbits( p_n - q_n - 1) | (2 << (p_n - q_n - 2))
         p=k*q+1
-        
-        if gmpy2.is_prime(p): #check p.bit_length() == p_n
-            print("bit size of q: ", q.bit_length())
-            print("bit size of p: ", p.bit_length())
-            return q,p,k
+        if(p.bit_length()==p_n):#check p.bit_length() == p_n
+            if gmpy2.is_prime(p): #check p is prime
+                print("bit size of q: ", q.bit_length())
+                print("bit size of p: ", p.bit_length())
+                return q,p,k
 
 def find_generator(p,q,k):
     g = 1 #initialize g
