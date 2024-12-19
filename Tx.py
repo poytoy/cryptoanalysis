@@ -1,6 +1,7 @@
 import random
 import DS  # Importing DS.py for signing and verifying
 import hashlib
+import PhaseI_Test as pt
 
 '''
 transaction format:
@@ -32,7 +33,7 @@ def gen_random_tx(q, p, g):
         f"Serial number: {serial_number}\n"
         f"Amount: {amount}\n"
         f"Payee public key (beta): {payee_beta}\n"
-        f"Payer public key (beta): {payer_beta}"
+        f"Payer public key (beta): {payer_beta}\n"
     )
     message = transaction_details.encode('utf-8')
 
@@ -47,35 +48,17 @@ def gen_random_tx(q, p, g):
         f"Serial number: {serial_number}\n"
         f"Amount: {amount}\n"
         f"Payee public key (beta): {payee_beta}\n"
-        f"Payer public key (beta): {payer_beta}\n"
+        f"Payer public key (beta): {payer_beta}"
     )
 
     return transaction
 
 def main():
     q, p, g = DS.GenerateOrRead("pubparams.txt")
-
     transaction = gen_random_tx(q, p, g)
-    print(f"Generated Transaction:{transaction}")
 
-    print("Verifying Transaction Signature...")
-    lines = transaction.split('\n')
-    s = int(lines[1].split(": ")[1])  # Extract Signature s
-    h = int(lines[2].split(": ")[1])  # Extract Signature h
-    payer_pk = int(lines[6].split(": ")[1])  # Extract Payer's public key
+    pt.CheckTransaction(q, p, g)
+    pt.CheckBlockofTransactions()
 
-    # Reconstruct the message (transaction details) for verification
-    message = '\n'.join(lines[3:7]).encode('utf-8')
-
-    # Verify the signature
-    if DS.SignVer(message, s, h, q, p, g, payer_pk) == 0:
-        print("Transaction signature is VALID.")
-    else:
-        print("Transaction signature is INVALID.")
-
-    #test with these
-    #CheckTransaction(q, p, g)
-    #CheckBlockofTransactions()
-
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()

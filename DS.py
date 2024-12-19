@@ -3,13 +3,13 @@ import gmpy2
 import hashlib
 import os
 import string
-import Tx
 
 #1.Setup for public parameter generation
 def random_string(length):
     #generates a random string of the specified length, with uppercase, lowercase, and digits.
     characters = string.ascii_letters + string.digits  # You can add more characters if needed
     return ''.join(random.choice(characters) for _ in range(length))
+
 def generate_n_bit_prime(n):
     if n < 2:
         raise ValueError("Number of bits must be at least 2.")
@@ -19,31 +19,31 @@ def generate_n_bit_prime(n):
         candidate = random.getrandbits(n) | (1 << (n - 1)) | 1  # Ensure n-bit and odd
         if gmpy2.is_prime(candidate):  # Check primality
             return candidate
+
 def generate_q_and_p(q_n,p_n):
     q = generate_n_bit_prime(q_n)
 
     for _ in range(10000000):
-        k = random.getrandbits( p_n-q_n-1) | (1 << (p_n - q_n - 2))
+        k = random.getrandbits( p_n - q_n - 1) | (1 << (p_n - q_n - 2))
         p=k*q+1
         
-        if gmpy2.is_prime(p):
+        if gmpy2.is_prime(p): #check p.bit_length() == p_n
+            print("bit size of q: ", q.bit_length())
+            print("bit size of p: ", p.bit_length())
             return q,p,k
-        
-def find_generator( q, p,k):
-    #p-1 divided by q for genenrator.
-    div=k
-    print("p-1",p-1)
-    print("q",q)
-    print("div",div)
 
-    for g in range(5,p-1):
-        if pow(g,div,p)!=1:
-            if pow(g,q,p)==1: # search for an easier way to deterime if order is exactly q.
-              return g
+def find_generator(p,q,k):
+    g = 1 #initialize g
+
+    while g == 1: #loop until valid generator is found
+        alpha = random.randint(2, p - 1) #random seed
+        g = pow(alpha, k, p) #candidate generator
+
+    return g
 
 #2.Key Generation
 def KeyGen(q,p,g):
-    alpha = int(input(f"chose random int between 0 and {q-1}:"))
+    alpha = int(input(f"Choose random int between 0 and {q-1}: "))
     beta = pow(g, alpha, p)
     return alpha, beta
 
@@ -73,9 +73,9 @@ def SignVer(message,s,h,q,p,g,beta):
     u_int = u_int%q
 
     if u_int == h:
-        print("Signature is valid!")
+        return 0
     else:
-        print("Signature is invalid!")  
+        return 1
 
 def GenerateOrRead(filename):
     #reads q, p, g from `filename` if it exists, otherwise generates and writes them to the file.
@@ -89,8 +89,8 @@ def GenerateOrRead(filename):
             return q, p, g
         
     else:
-        q,p,k = generate_q_and_p(10,25)#should be 224 2048
-        g = find_generator(q,p,k)
+        q,p,k = generate_q_and_p(224,2048)#should be 224 2048
+        g = find_generator(p,q,k)
         with open(filename, 'w') as file:
             file.write(f"{q}\n")
             file.write(f"{p}\n")
@@ -107,13 +107,15 @@ def main():
     message=b"hello world"
     s,h = SignGen(message,q,p,g,alpha)
 
-    SignVer(message,s,h,q,p,g,beta)
+    if(SignVer(message,s,h,q,p,g,beta)):
+        print("Signature is valid")
+    else:
+        print("Signature is invalid")
 
     #publish q,p,beta,g
     #private user_input
     #tests,
     #1PhaseI_Test.checkDSparams(q,p,g)
-    
    
-if __name__ =="__main__":
-    main()
+#if __name__ =="__main__":
+#    main()
