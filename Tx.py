@@ -1,7 +1,7 @@
 import random
 import DS  # Importing DS.py for signing and verifying
 import hashlib
-import PhaseI_Test as pt
+
 
 '''
 transaction format:
@@ -52,13 +52,3 @@ def gen_random_tx(q, p, g):
     )
 
     return transaction
-
-def main():
-    q, p, g = DS.GenerateOrRead("pubparams.txt")
-    transaction = gen_random_tx(q, p, g)
-
-    pt.CheckTransaction(q, p, g)
-    pt.CheckBlockofTransactions()
-
-#if __name__ == "__main__":
-#    main()

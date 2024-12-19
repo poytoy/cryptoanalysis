@@ -24,7 +24,7 @@ def generate_q_and_p(q_n,p_n):
     q = generate_n_bit_prime(q_n)
 
     for _ in range(10000000):
-        k = random.getrandbits( p_n - q_n - 1) | (1 << (p_n - q_n - 2))
+        k = random.getrandbits( p_n - q_n)
         p=k*q+1
         
         if gmpy2.is_prime(p): #check p.bit_length() == p_n
