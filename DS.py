@@ -96,26 +96,3 @@ def GenerateOrRead(filename):
             file.write(f"{p}\n")
             file.write(f"{g}\n")
         return q, p, g
-
-def main():
-    q,p,g=GenerateOrRead("pubparams.txt")
-    
-    print(f"g: {g}")
-
-    alpha, beta = KeyGen(q,p,g)
-
-    message=b"hello world"
-    s,h = SignGen(message,q,p,g,alpha)
-
-    if(SignVer(message,s,h,q,p,g,beta)):
-        print("Signature is valid")
-    else:
-        print("Signature is invalid")
-
-    #publish q,p,beta,g
-    #private user_input
-    #tests,
-    #1PhaseI_Test.checkDSparams(q,p,g)
-   
-#if __name__ =="__main__":
-#    main()
