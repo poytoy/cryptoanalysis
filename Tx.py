@@ -52,3 +52,18 @@ def gen_random_tx(q, p, g):
     )
 
     return transaction
+
+def gen_random_txblock(q, p, g, TxCnt, filename):
+    #generate “TxCnt” random transactions and write those transactions into the file “transactions.txt”
+    
+    if(TxCnt & (TxCnt - 1)): #make sure that “TxCnt” is always a power of two
+        raise ValueError("TxCnt must be a power of two")
+
+    for i in range(TxCnt):
+        tx = gen_random_tx(q, p, g)
+
+        with open(filename, 'a') as f:
+            if i < TxCnt - 1:
+                f.write(tx + "\n")
+            else:
+                f.write(tx) #don't add newline to the last transaction
