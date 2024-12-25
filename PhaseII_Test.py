@@ -97,11 +97,11 @@ TxCnt = 64
 
 # # Test 1 #
 # Check all your transactions in a block
-# ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
-# if ReturnCode == -10000: print("File Problem")
-# elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
-# elif ReturnCode == 0: print("All Transactions Verify")
-# else: print("Unexpected branching")
+ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
+if ReturnCode == -10000: print("File Problem")
+elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
+elif ReturnCode == 0: print("All Transactions Verify")
+else: print("Unexpected branching")
 
 
 # Test 2 #
