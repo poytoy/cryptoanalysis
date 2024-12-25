@@ -7,7 +7,7 @@ import warnings
 import sympy
 import DS       # This is the file from Phase I
 import Tx       # This is the first file you have to submit in the second phase 
-#import PoW      # This is the second file you have to submit in the second phase 
+import PoW      # This is the second file you have to submit in the second phase 
 import os.path
 import sys
 
@@ -93,21 +93,23 @@ else:
 # This is for generating a random transaction block
 # You should have a function with the name "Tx.gen_random_txblock()" in "Tx.py"
 TxCnt = 64
-Tx.gen_random_txblock(q, p, g, TxCnt, "transactions.txt")
+# Tx.gen_random_txblock(q, p, g, TxCnt, "transactions.txt")
 
-# Test 1 #
+# # Test 1 #
 # Check all your transactions in a block
-ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
-if ReturnCode == -10000: print("File Problem")
-elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
-elif ReturnCode == 0: print("All Transactions Verify")
-else: print("Unexpected branching")
+# ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
+# if ReturnCode == -10000: print("File Problem")
+# elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
+# elif ReturnCode == 0: print("All Transactions Verify")
+# else: print("Unexpected branching")
 
-'''
+
 # Test 2 #
 # Check PoW of the sample block
 print("\nTest 2 is running")
 proof = PoW.CheckPow(p, q, g, 5, TxCnt, "block_sample.txt")
+print()
+print(proof)
 if proof == "" or proof[:5] != "00000":
     print("PoW is NOT OK:", proof)
 else:
@@ -136,4 +138,3 @@ if proof == "" or proof[:PoWLen] != "0"*PoWLen:
     print("PoW is NOT OK:", proof)
 else:
     print("PoW is OK:", proof)
-'''
