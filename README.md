@@ -1,3 +1,3 @@
 # cryptoanalysis
 final project
-lets make sure that transaction file is initially empty!
+We have to fix block.txt file creation and filling.
