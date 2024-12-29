@@ -92,7 +92,7 @@ else:
 
 # This is for generating a random transaction block
 # You should have a function with the name "Tx.gen_random_txblock()" in "Tx.py"
-TxCnt = 64
+TxCnt = 1
 Tx.gen_random_txblock(q, p, g, TxCnt, "transactions.txt")
 
 # # Test 1 #

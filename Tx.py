@@ -1,7 +1,7 @@
 import random
 import DS  # Importing DS.py for signing and verifying
 import hashlib
-
+import os
 
 '''
 transaction format:
@@ -59,10 +59,12 @@ def gen_random_txblock(q, p, g, TxCnt, filename):
     if(TxCnt & (TxCnt - 1)): #make sure that “TxCnt” is always a power of two
         raise ValueError("TxCnt must be a power of two")
 
-    for i in range(TxCnt):
-        tx = gen_random_tx(q, p, g)
+    mode = 'w' if os.path.exists(filename) else 'a' #if the file does not exist open a new one
+    
+    with open(filename, mode) as f:
+        for i in range(TxCnt):
+            tx = gen_random_tx(q, p, g)
 
-        with open(filename, 'a') as f:
             if i < TxCnt - 1:
                 f.write(tx + "\n")
             else:
