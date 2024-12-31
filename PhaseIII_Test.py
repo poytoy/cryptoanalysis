@@ -15,7 +15,7 @@ from Crypto.Hash import SHA3_256
 
 # These are your modules
 import ECDSA         # You have to submit this file,  
-# import ChainGen      # You have to submit this file  
+import ChainGen      # You have to submit this file  
 
 TxLen = 9
 
@@ -153,73 +153,73 @@ elif(ReturnCode < 0): print("Test III: Signature Problem in Transaction number",
 elif ReturnCode == 0: print("Test III: All transactions verify")
 else: print("Test III: Unexpected branching")
 
-# # Test IV
-# #########
-# # Generate the blockchain
-# TxCnt = 16       # number of transactions in a single block
-# ChainLen = 10    # number of blocks
-# PoWLen = 4
-# filename = "Block"
-# ctr = 0
+# Test IV
+#########
+# Generate the blockchain
+TxCnt = 16       # number of transactions in a single block
+ChainLen = 10    # number of blocks
+PoWLen = 4
+filename = "Block"
+ctr = 0
 
-# # The first link in the chain 
-# # The block_candidate contains only the transactions; neither PrevPow nor nonce
-# PrevBlock = ""  # Previous block doesn't exist as this is the first link
-# transactions = gen_random_txblock(E, TxCnt) # generate random transactions
-# f = open("tmp.txt", "w")
-# f.write(transactions)
-# f.close()                                   # write the transactions into "tmp.txt"
+# The first link in the chain 
+# The block_candidate contains only the transactions; neither PrevPow nor nonce
+PrevBlock = ""  # Previous block doesn't exist as this is the first link
+transactions = gen_random_txblock(E, TxCnt) # generate random transactions
+f = open("tmp.txt", "w")
+f.write(transactions)
+f.close()                                   # write the transactions into "tmp.txt"
 
-# f = open("tmp.txt", "r")
-# block_candidate = f.readlines()
-# f.close()                                   # read the transactions from "tmp.txt"
+f = open("tmp.txt", "r")
+block_candidate = f.readlines()
+f.close()                                   # read the transactions from "tmp.txt"
 
-# # Calculate the first block in the chain
-# NewBlock, PrevPoW = ChainGen.AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock)
-# f = open(filename + "0.txt", "w")
-# f.write(NewBlock)
-# f.close()
+# Calculate the first block in the chain
+NewBlock, PrevPoW = ChainGen.AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock)
+f = open(filename + "0.txt", "w")
+f.write(NewBlock)
+f.close()
 
-# # Create the other links in the chain
-# for i in range(1, ChainLen):
-#     # read the previous block from the file
-#     f = open(filename + str(i-1) + ".txt", "r")
-#     PrevBlock = f.readlines()  
-#     f.close()
+# Create the other links in the chain
+for i in range(1, ChainLen):
+    # read the previous block from the file
+    f = open(filename + str(i-1) + ".txt", "r")
+    PrevBlock = f.readlines()  
+    f.close()
 
-#     transactions = gen_random_txblock(E, TxCnt)
-#     f = open("tmp.txt", "w")
-#     f.write(transactions)
-#     f.close()
+    transactions = gen_random_txblock(E, TxCnt)
+    f = open("tmp.txt", "w")
+    f.write(transactions)
+    f.close()
 
-#     f = open("tmp.txt", "r")
-#     block_candidate = f.readlines()
-#     f.close()    
+    f = open("tmp.txt", "r")
+    block_candidate = f.readlines()
+    f.close()    
 
-#     NewBlock, PrevPoW = ChainGen.AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock)
-#     # Write the new block to a file 
-#     f = open(filename + str(i) + ".txt", "w")
-#     f.write(NewBlock)
-#     f.close()
-#     if PrevPoW[:PoWLen] != "0"*PoWLen:
-#         print("Block " + str(i) + " failed Test IV: BadPrevPoW")
+    NewBlock, PrevPoW = ChainGen.AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock)
+    # Write the new block to a file 
+    f = open(filename + str(i) + ".txt", "w")
+    f.write(NewBlock)
+    f.close()
+    if PrevPoW[:PoWLen] != "0"*PoWLen:
+        print("Block " + str(i) + " failed Test IV: BadPrevPoW")
 
-# # And check the blockchain
-# # First block
-# f = open(filename + "0.txt", "r")
-# Block = f.readlines()
-# f.close()
-# PoW, PrevPoW = CheckBlock(TxCnt, Block)
-# if PoW[0:PoWLen] == "0"*PoWLen: print("Block 0 passed Test IV")
-# else: print("Block 0 failed Test IV")
+# And check the blockchain
+# First block
+f = open(filename + "0.txt", "r")
+Block = f.readlines()
+f.close()
+PoW, PrevPoW = CheckBlock(TxCnt, Block)
+if PoW[0:PoWLen] == "0"*PoWLen: print("Block 0 passed Test IV")
+else: print("Block 0 failed Test IV")
 
-# # And the subsequent blocks
-# for i in range(1, ChainLen):
-#     PrevPoW = PoW
-#     f = open(filename + str(i) + ".txt", "r")
-#     Block = f.readlines()
-#     f.close()
-#     PoW, PrevPoW_ = CheckBlock(TxCnt, Block)
-#     if PoW[0:PoWLen] == "0"*PoWLen and PrevPoW == PrevPoW_:
-#         print("Block " + str(i) + " passed Test IV")
-#     else: print("Block " + str(i) + " failed Test IV")
+# And the subsequent blocks
+for i in range(1, ChainLen):
+    PrevPoW = PoW
+    f = open(filename + str(i) + ".txt", "r")
+    Block = f.readlines()
+    f.close()
+    PoW, PrevPoW_ = CheckBlock(TxCnt, Block)
+    if PoW[0:PoWLen] == "0"*PoWLen and PrevPoW == PrevPoW_:
+        print("Block " + str(i) + " passed Test IV")
+    else: print("Block " + str(i) + " failed Test IV")

@@ -3,15 +3,14 @@ from ecpy.keys import ECPublicKey, ECPrivateKey
 from Crypto.Hash import SHA3_256
 import random
 
-# Set up the curve (secp256k1 in this example, commonly used in blockchain applications)
-curve = Curve.get_curve('secp256k1')
+curve = Curve.get_curve('secp256k1') #set up the curve
 
-#key generation
-def KeyGen(curve):
+def KeyGen(curve): #key generation
     """Generates a public-private key pair using the secp256k1 curve."""
-    private_key = random.randint(2, curve.order - 1)#get rand private key
+    private_key = random.randint(2, curve.order - 1) #get rand private key
     public_key = private_key * curve.generator #generate public key w curve
     return private_key, public_key
+
 def SignGen(message, curve, private_key):
     """Generates a signature for a message using ECDSA.
     Args:
@@ -28,6 +27,7 @@ def SignGen(message, curve, private_key):
     s = (k - private_key * h) % curve.order
 
     return s, h
+
 def SignVer(message, s, h, curve, public_key):
     """Verifies an ECDSA signature.
     Args:
