@@ -1,7 +1,3 @@
-from ecpy.curves import Curve, Point
-from ecpy.keys import ECPublicKey, ECPrivateKey
-import hashlib
-import random
 import hashlib
 
 def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
@@ -9,11 +5,10 @@ def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
     if not PrevBlock: #if first block
         PrevPoW = "00000000000000000000"
     else:
-        PrevPoW = PrevBlock[0].strip().split(":")[1].strip()
-
+        PrevPoW = hashlib.sha3_256("".join(PrevBlock).encode('utf-8')).hexdigest()
 
     #read transactions from the block candidate
-    transactions = "".join(block_candidate)
+    transactions = "".join(block_candidate[:TxCnt*9])
 
     '''target_prefix = '0' * PoWLen
     nonce = 0
@@ -31,11 +26,11 @@ def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
             break
         nonce += 1'''
 
-    nonce = PoW(PoWLen, transactions, PrevPoW)
-
+    nonce, pow = PoW(PoWLen, transactions, PrevPoW)
     NewBlock = f"Previous PoW: {PrevPoW}\n" + f"Nonce: {nonce}\n" + transactions
-    NewPow = hashlib.sha3_256((f"{PrevPoW}{transactions}{nonce}").encode('utf-8')).hexdigest()
-    return NewBlock, NewPow
+    NewPow = hashlib.sha3_256(NewBlock.encode('utf-8')).hexdigest()
+
+    return NewBlock, pow
 
 
 '''our functions from phase II's PoW.py'''
@@ -74,6 +69,9 @@ def PoW(pow_len, transactions, PrevPoW):
         
         hash_value = hashlib.sha3_256(data).hexdigest() #compute the SHA3-256 hash
         if hash_value.startswith(target_prefix):
-            return nonce
+            print(f"Nonce found: {nonce}")
+            print(f"PoW: {hash_value}")
+            print(target_prefix)
+            return nonce, hash_value
 
         nonce += 1
