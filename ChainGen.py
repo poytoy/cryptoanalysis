@@ -1,36 +1,20 @@
 import hashlib
 
+#the pdf says the arguments should be as PoWLen, TxCnt, PrevBlock, block_candidate; but i followed the order in the PhaseIII_Test.py
 def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
-    #determine the previous PoW form the last block in the chain
+
     if not PrevBlock: #if first block
         PrevPoW = "00000000000000000000"
-    else:
-        PrevPoW = hashlib.sha3_256("".join(PrevBlock).encode('utf-8')).hexdigest()
+        nonce, _ = PoW(PoWLen, "".join(PrevBlock[2:]), PrevPoW)
+    else: #determine the previous PoW form the last block in the chain
+        nonce, PrevPoW = PoW(PoWLen, "".join(PrevBlock[2:]), PrevBlock[0][14:])
+        #PrevPoW = hashlib.sha3_256("".join(PrevBlock).encode('utf-8')).hexdigest()
 
     #read transactions from the block candidate
     transactions = "".join(block_candidate[:TxCnt*9])
-
-    '''target_prefix = '0' * PoWLen
-    nonce = 0
-
-    #perform proof of work
-    while True:
-        # Convert nonce to bytes
-        nonce_bytes = nonce.to_bytes((nonce.bit_length() + 7) // 8, byteorder="big")
-        # Combine data for hashing
-        data = transactions.encode("utf-8") + nonce_bytes
-        # Compute the hash
-        hash_value = hashlib.sha3_256(data.encode('utf-8')).hexdigest()
-        # Check if it meets the target
-        if hash_value.startswith(target_prefix):
-            break
-        nonce += 1'''
-
-    nonce, pow = PoW(PoWLen, transactions, PrevPoW)
     NewBlock = f"Previous PoW: {PrevPoW}\n" + f"Nonce: {nonce}\n" + transactions
-    NewPow = hashlib.sha3_256(NewBlock.encode('utf-8')).hexdigest()
 
-    return NewBlock, pow
+    return NewBlock, PrevPoW
 
 
 '''our functions from phase II's PoW.py'''
@@ -54,13 +38,13 @@ def merkle_root(transactions: list) -> str:
     
     return hashes[0] #the remaining hash is the Merkle root
 
-def PoW(pow_len, transactions, PrevPoW):
+def PoW(PowLen, transactions, PrevPoW):
     #finds a valid random nonce such that SHA3-256(Hr || nonce) starts with `pow_len` zeros.
  
     root = hashlib.sha3_256((transactions + PrevPoW).encode('utf-8')).hexdigest() #compute the merkle root
     root = root.encode('utf-8')
 
-    target_prefix = '0' * pow_len  
+    target_prefix = '0' * PowLen  
     nonce = 0
 
     while True:
@@ -69,9 +53,6 @@ def PoW(pow_len, transactions, PrevPoW):
         
         hash_value = hashlib.sha3_256(data).hexdigest() #compute the SHA3-256 hash
         if hash_value.startswith(target_prefix):
-            print(f"Nonce found: {nonce}")
-            print(f"PoW: {hash_value}")
-            print(target_prefix)
             return nonce, hash_value
 
         nonce += 1
