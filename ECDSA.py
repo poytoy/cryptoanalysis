@@ -1,5 +1,4 @@
-from ecpy.curves import Curve, Point
-from ecpy.keys import ECPublicKey, ECPrivateKey
+from ecpy.curves import Curve
 from Crypto.Hash import SHA3_256
 import random
 
