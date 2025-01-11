@@ -19,6 +19,7 @@ def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
 
 
 '''our functions from phase II's PoW.py'''
+'''our function implelemts phaseIII test merkle root!'''
 def sha3_256(data):
     # Compute SHA3-256 hash and return the digest
     if isinstance(data, str):
@@ -40,7 +41,7 @@ def merkle_root(transactions: list) -> bytes:
             hashTree.append(SHA3_256.new(combined).digest())
         j += t
         t = t >> 1  # Move to the next level
-
+    
     return hashTree[2 * len(transactions) - 2]
 def PoW(PowLen, transactions, PrevPoW):
     #finds a valid random nonce such that SHA3-256(Hr||prevPoW || nonce) starts with `pow_len` zeros.
@@ -58,7 +59,6 @@ def PoW(PowLen, transactions, PrevPoW):
         
         hash_value = hashlib.sha3_256(data).hexdigest() #compute the SHA3-256 hash
         if hash_value.startswith(target_prefix):
-            print("root: ",root)
             return nonce, hash_value
         
 

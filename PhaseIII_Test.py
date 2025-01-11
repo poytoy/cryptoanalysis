@@ -104,9 +104,11 @@ def CheckBlock(TxCnt, Block):
         t = t>>1
 
     H_r = hashTree[2*TxCnt-2]
-        
+    
+    
     digest = H_r + PrevPoW + nonce.to_bytes((nonce.bit_length()+7)//8, byteorder = 'big')
     PoW = SHA3_256.new(digest).hexdigest()
+    #print("H_R: ",H_r)
     return PoW, PrevPoW_
 
 ##############        
